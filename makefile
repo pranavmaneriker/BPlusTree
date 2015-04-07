@@ -1,9 +1,9 @@
-all: main btree 
+all: maintar btreetar
 	g++ -g mainc btree -o main
 
-main:
+maintar: main.cpp
 	g++ -g -c main.cpp -o mainc
-btree: btree.cpp btree.hpp
+btreetar: btree.cpp btree.hpp
 	g++ -g -c btree.cpp -o btree
 
 clean: 

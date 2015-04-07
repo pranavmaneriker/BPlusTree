@@ -2,12 +2,13 @@
 #define __BTREE__
 #include<string>
 #include<sstream>
+#include "global.h"
 /**
 Classes for the tree and nodes
 **/
 using namespace std;
 
-class Helpers{
+class Helpers{	//use static if time
 public:
 	string numToStr(int num)
 	{
@@ -17,7 +18,7 @@ public:
 	}
 	string nodefileName(const string& dataFile)
 	{
-		string prefix = "node/";
+		string prefix = "nodes/";
 		return prefix + dataFile;
 	}
 
@@ -38,12 +39,14 @@ class BPTreeNode : Helpers{
 	string * lChild;	//left child file / dataFile for this key
 	string nextLeaf;		//rightmost child/ next leaf
 	string fName; 		//own filename
+	string rmChild;		//rightmost child
 
 	BPTreeNode(int ch)
 	{
 		lChild = new string[ch];
 		keys = new float[ch];
 		parent = "none";
+		rmChild = "none";
 		leaf = true;
 	}
 	bool isLeaf(){ return leaf; }
@@ -63,7 +66,7 @@ class BPTree : Helpers{
 	{
 		intNodes = 0;
 		leafNodes = 0;
-		root = "0";
+		datFiles = 0;
 	}
 	void writeMetaData();
 	BPTreeNode searchT(float key, const string& dataFile);
@@ -73,7 +76,7 @@ class BPTree : Helpers{
 	void insertNode(float splitval, const string& newRchild,const string& origNode);
 	void splitNode(BPTreeNode t);
 	void splitLeafNode(BPTreeNode t);
-
+	void loadMetaData();
 };
 
 #endif
