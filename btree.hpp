@@ -63,7 +63,7 @@ class BPTree : Helpers{
 	{
 		intNodes = 0;
 		leafNodes = 0;
-		root = "1";
+		root = "0";
 	}
 	void writeMetaData();
 	BPTreeNode searchT(float key, const string& dataFile);
