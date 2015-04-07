@@ -1,6 +1,8 @@
 #include<string>
 #include<iostream>
 #include<iomanip>
+#include<cstring>
+#include<cstdio>
 #include "btree.hpp"
 
 using namespace std;
@@ -17,19 +19,19 @@ int main(int argc, char ** argv)
 	{
 		float key;
 		string value;
-		freopen(stdin,"r", "bplustree.config"); 
+		freopen("bplustree.config", "r", stdin); 
 		int degree;
 		cin>>degree;
 		fclose(stdin);
 		if(freopen(argv[2], "r", stdin))
 		{
 			//STDIN contains the datafile, create the tree
-			BTree b = new Btree(degree);
+			BPTree * b = new BPTree(degree);
 			while(cin>>key>>value)
 			{
-				b.insert(key, value);
+				b->insert(key, value);
 			}
-			b.writeMetaData();
+			b->writeMetaData();
 			fclose(stdin);
 			cout<<"Tree created successfully"<<endl;
 		}

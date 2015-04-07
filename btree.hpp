@@ -1,47 +1,78 @@
 #ifndef __BTREE__
 #define __BTREE__
 #include<string>
-
+#include<sstream>
 /**
 Classes for the tree and nodes
 **/
 using namespace std;
 
-class BPTreeNode{
-	private:
+class Helpers{
+public:
+	string numToStr(int num)
+	{
+		stringstream ss;
+		ss << num;
+		return ss.str();	
+	}
+	string nodefileName(const string& dataFile)
+	{
+		string prefix = "node/";
+		return prefix + dataFile;
+	}
+
+	string datafileName(const string& dataFile)
+	{
+		string prefix = "data/";
+		return prefix + dataFile;
+	}
+
+};
+
+class BPTreeNode : Helpers{
+	public:
 	bool leaf;
 	string parent;
-	float * keys;
-	string * valueF;	//valueFile
 	int cCount; //children
-	public:
+	float * keys;
 	string * lChild;	//left child file / dataFile for this key
-	string rmChild;		//rightmost child/ next leaf
+	string nextLeaf;		//rightmost child/ next leaf
+	string fName; 		//own filename
+
 	BPTreeNode(int ch)
 	{
-		values = new string[ch];
-		keys = new string[ch];
+		lChild = new string[ch];
+		keys = new float[ch];
+		parent = "none";
 		leaf = true;
 	}
 	bool isLeaf(){ return leaf; }
-	BPTreeNode(const string& dataFile); //load node from datafile
+	BPTreeNode(const string& dataFile, int degree); //load node from datafile
+	string searchLoc(float key);	//search in this node
+	void writeToSelf();
+	
 };
 
-class BPTree{
+class BPTree : Helpers{
 	string root;
 	int degree;
 	int intNodes, leafNodes, datFiles;
-	string root;
 
 	public:
 	BPTree(int d): degree(d)
 	{
 		intNodes = 0;
 		leafNodes = 0;
-		root = "1"
+		root = "1";
 	}
-	void writeMeta Data();
-	void insert(int key, const string& value);	
+	void writeMetaData();
+	BPTreeNode searchT(float key, const string& dataFile);
+	void insert(float key, const string& value); //insert node in this	
+	BPTreeNode search(float key);
+	void splitNode();
+	void insertNode(float splitval, const string& newRchild,const string& origNode);
+	void splitNode(BPTreeNode t);
+	void splitLeafNode(BPTreeNode t);
 
 };
 
