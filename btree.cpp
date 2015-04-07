@@ -12,12 +12,12 @@
 		    cCount
 		    keys values/lchilds
 		    ... 
-		    rchild/nextleaf
+		    rchild/nextleaf [prevleaf]
 */
 BPTreeNode::BPTreeNode(const string& dataFile, int degree)
 {
 
-	keys = new float[degree];
+	keys = new double[degree];
 	lChild = new string[degree];
 	string toWrite = nodefileName(dataFile);
 	ifstream file;
@@ -34,7 +34,7 @@ BPTreeNode::BPTreeNode(const string& dataFile, int degree)
 			file>>keys[i]>>lChild[i];
 		}
 		if(!leaf)cCount++;
-		if(leaf)file>>nextLeaf;
+		if(leaf) file>>nextLeaf>>prevLeaf;
 		else file>>rmChild;
 		file.close();
 	}
@@ -57,7 +57,7 @@ BPTreeNode::writeToSelf()
 		file<<keys[i]<<" "<<lChild[i]<<endl;
 	}	
 	if(!leaf)cCount++;
-	if(leaf) file<<nextLeaf;
+	if(leaf) file<<nextLeaf<<" "<<prevLeaf;
 	else file<<rmChild;
 	file.close();
 }
@@ -67,7 +67,7 @@ BPTree::splitLeafNode(BPTreeNode left)
 {
 
 	int lC = left.cCount/2 , rC = left.cCount - lC;
-	float sepval = left.keys[lC];
+	double sepval = left.keys[lC];
 
 	string p = left.parent;
 	BPTreeNode right(degree);
@@ -76,7 +76,14 @@ BPTree::splitLeafNode(BPTreeNode left)
 	left.fName = numToStr(intNodes++); leafNodes++;
 	right.parent = p;
 	right.nextLeaf = left.nextLeaf;
+	right.prevLeaf = left.fName;
 	left.nextLeaf = right.fName;
+	if(left.prevLeaf != "none")
+	{
+		BPTreeNode temp(left.prevLeaf, degree);
+		temp.nextLeaf = left.fName;
+		temp.writeToSelf();
+	}
 
 	for(int i=lC;i<left.cCount;++i)
 	{
@@ -118,8 +125,8 @@ BPTree::splitNode(BPTreeNode left)
 {
 
 	string p = left.parent;
-	int lC = left.cCount/2 , rC = left.cCount - lC;
-	float sepval = left.keys[lC];
+	int lC = left.cCount/2 - 1 , rC = left.cCount - lC - 1;
+	double sepval = left.keys[lC];
 
 	BPTreeNode right(degree);
 
@@ -128,13 +135,13 @@ BPTree::splitNode(BPTreeNode left)
 	left.fName = numToStr(intNodes++); leafNodes++;
 	right.parent = p;
 
-	for(int i=lC;i<left.cCount-1;++i)
+	for(int i=lC+1;i<left.cCount-1;++i)
 	{
-		right.keys[i-lC] = left.keys[i];
-		right.lChild[i-lC] = left.lChild[i];
+		right.keys[i-lC-1] = left.keys[i];
+		right.lChild[i-lC-1] = left.lChild[i];
 	}
 	right.rmChild = left.rmChild;	
-	left.rmChild = left.lChild[lC-1];
+	left.rmChild = left.lChild[lC];
 	left.cCount = lC;
 	right.cCount = rC;
 
@@ -144,6 +151,8 @@ BPTree::splitNode(BPTreeNode left)
 		root = p;
 		left.parent = p;
 		right.parent = p;
+		right.writeToSelf();
+		left.writeToSelf();
 		//foll code can be put in func
 		BPTreeNode parentNode(degree);	
 		parentNode.fName = p;
@@ -153,35 +162,28 @@ BPTree::splitNode(BPTreeNode left)
 		parentNode.cCount = 2;
 		parentNode.rmChild = right.fName;
 		parentNode.writeToSelf();
-		right.writeToSelf();
-		left.writeToSelf();
 	}
 	else{
+			insertNode(sepval, left.fName, p);
 			right.writeToSelf();
 			left.writeToSelf();
-			insertNode(sepval, left.fName, p);
 	} 
 
 	writeMetaData();
 }
 
 void
-BPTree::insertNode(float splitval,const string& newRchild, const string& origNode)
+BPTree::insertNode(double splitval,const string& newLchild, const string& origNode)
 {
 
 	BPTreeNode curNode(origNode, degree);
 
-	vector<pair<float, string> > datavals;
+	vector<pair<double, string> > datavals;
 	for(int i=0;i<curNode.cCount-1 ;++i)
 	{
 		datavals.push_back(make_pair(curNode.keys[i], curNode.lChild[i]));
 	}
-	if(splitval > curNode.keys[curNode.cCount-2])
-	{
-		datavals.push_back(make_pair(splitval, curNode.rmChild));
-		curNode.rmChild = newRchild;
-	}
-	else{ datavals.push_back(make_pair(splitval, newRchild)); }
+	datavals.push_back(make_pair(splitval, newLchild));
 	sort(datavals.begin(), datavals.end());
 
 	if(curNode.cCount < degree)
@@ -197,13 +199,20 @@ BPTree::insertNode(float splitval,const string& newRchild, const string& origNod
 	}
 	else
 	{
+		curNode.cCount++;
+
+		for(int i=0;i<datavals.size();++i)
+		{
+			curNode.keys[i] = datavals[i].first;
+			curNode.lChild[i] = datavals[i].second;
+		}
 		splitNode(curNode);
 	}	
 }
 
 
 string
-BPTreeNode::searchLoc(float key)
+BPTreeNode::searchLoc(double key)
 {
 
 		for(int i=0; i<cCount; ++i)
@@ -237,7 +246,7 @@ void BPTree::loadMetaData()
 }
 
 void
-BPTree::insert(float key, const string& value)
+BPTree::insert(double key, const string& value)
 {
 
 		//create the data file to hold this value
@@ -253,9 +262,9 @@ BPTree::insert(float key, const string& value)
 		//TODO Handle first insertion
 		BPTreeNode insertInto(degree);
 		if(leafNodes > 0) { writeMetaData(); insertInto = search(key); }
-		else { insertInto.fName = numToStr(intNodes++); leafNodes++; insertInto.nextLeaf = "none";}
+		else { insertInto.fName = numToStr(intNodes++); leafNodes++; insertInto.nextLeaf = "none"; root = datName;}
 
-		vector<pair<float, string> > datavals;
+		vector<pair<double, string> > datavals;
 		int i;
 		for(i=0;i<insertInto.cCount;++i)
 		{
@@ -288,7 +297,7 @@ BPTree::insert(float key, const string& value)
 
 
 BPTreeNode
-BPTree::search(float key)
+BPTree::search(double key)
 {
 
 	ifstream file;
@@ -301,7 +310,7 @@ BPTree::search(float key)
 }
 
 BPTreeNode 
-BPTree::searchT(float key, const string& dataFile)
+BPTree::searchT(double key, const string& dataFile)
 {
 
 	BPTreeNode f(dataFile, degree);

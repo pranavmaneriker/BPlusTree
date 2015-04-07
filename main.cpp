@@ -43,21 +43,25 @@ int main(int argc, char ** argv)
 	bool didSomething = false;
 	if(argc != 3)
 	{
-		cerr<<"Incorrect usage. Refer README for correct use."<<endl;
+		cerr<<"Incorrect usage. Use -c for initialisation and -x for queries."<<endl;
+		cerr<<"Eg ./main -c input.txt"<<endl;
+		cerr<<"./main -x queries.txt"<<endl;
 		return 1;
 	}
 	else if(strcmp(argv[1], "-c") == 0) //only inserts to create the tree
 	{
-		float key;
+		double key;
 		string value;
 		didSomething = true;
-		if(freopen(argv[2], "r", stdin))
+		ifstream file;
+		file.open(argv[2]);
+		if(file.is_open())
 		{
 			//STDIN contains the datafile, create the tree
 			BPTree * b = new BPTree(degree);
 
 			typeOfQ = 0;
-			while(cin>>key>>value)
+			while(file>>key>>value)
 			{
 				updDASt();
 				start = getTimeMs();
@@ -83,7 +87,7 @@ int main(int argc, char ** argv)
 			BPTree * b = new BPTree(degree);
 			b->loadMetaData();
 			int type;
-			float l,diff;
+			double l,diff;
 			string s;
 			while(cin>>type>>l)
 			{
@@ -119,8 +123,8 @@ int main(int argc, char ** argv)
 					typeOfQ = 2;
 					cout<<count<<": ";
 					cin>>diff;
-					float lval = l-diff;
-					float rval = l+diff;
+					double lval = l-diff;
+					double rval = l+diff;
 					start = getTimeMs();
 					updDASt();
 					BPTreeNode lnode = b->search(lval);
