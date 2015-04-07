@@ -74,6 +74,7 @@ BPTree::splitLeafNode(BPTreeNode left)
 
 	right.fName = left.fName;
 	left.fName = numToStr(intNodes++); leafNodes++;
+	writeMetaData();
 	right.parent = p;
 	right.nextLeaf = left.nextLeaf;
 	right.prevLeaf = left.fName;
@@ -215,7 +216,7 @@ string
 BPTreeNode::searchLoc(double key)
 {
 
-		for(int i=0; i<cCount; ++i)
+		for(int i=0; i<cCount-1; ++i)
 		{
 			if(key < keys[i]) return lChild[i];	
 		}
