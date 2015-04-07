@@ -4,6 +4,8 @@
 #include<algorithm>
 #include<vector>
 #include<utility>
+#include<fstream>
+#include<assert.h>
 
 /* format of file - leaf parent  
 		    cCount
@@ -16,17 +18,19 @@ BPTreeNode::BPTreeNode(const string& dataFile, int degree)
 	keys = new float[degree];
 	lChild = new string[degree];
 	string toWrite = nodefileName(dataFile);
-	if(freopen(toWrite.c_str(), "r", stdin))
+	ifstream file;
+	file.open(toWrite.c_str());
+	if(file.is_open())
 	{
 		fName = dataFile;
-		cin>>leaf>>parent;
-		cin>>cCount;
+		file>>leaf>>parent;
+		file>>cCount;
 		for(int i=0;i < cCount ;++i)
 		{
-			cin>>keys[i]>>lChild[i];
+			file>>keys[i]>>lChild[i];
 		}
-		if(leaf)cin>>nextLeaf;
-		fclose(stdin);
+		if(leaf)file>>nextLeaf;
+		file.close();
 	}
 }
 
@@ -35,15 +39,17 @@ void
 BPTreeNode::writeToSelf()
 {
 	string toWrite = nodefileName(fName);
-	freopen(fName.c_str(), "w", stdout);
-	cout<<leaf<<" "<<parent<<endl;
-	cout<<cCount<<endl;
+	ofstream file;
+	file.open(fName.c_str());
+	assert(file.is_open());
+	file<<leaf<<" "<<parent<<endl;
+	file<<cCount<<endl;
 	for(int i=0;i<cCount;++i)
 	{
-		cout<<keys[i]<<" "<<lChild[i]<<endl;
+		file<<keys[i]<<" "<<lChild[i]<<endl;
 	}	
-	if(leaf)cout<<nextLeaf;
-	fclose(stdout);
+	if(leaf)file<<nextLeaf;
+	file.close();
 }
 
 void
@@ -162,9 +168,10 @@ void
 BPTree::writeMetaData()
 {
 	//output format: internalnodes leafnodes root datfiles
-	freopen("meta", "w", stdout);
-	cout<<intNodes<<" "<<leafNodes<<" "<<root<<" "<<datFiles<<endl;
-	fclose(stdin);
+	ofstream file;
+	file.open("meta");
+	file<<intNodes<<" "<<leafNodes<<" "<<root<<" "<<datFiles<<endl;
+	file.close();
 }
 
 void
@@ -173,9 +180,10 @@ BPTree::insert(float key, const string& value)
 		//create the data file to hold this value
 		string datName = numToStr(datFiles++);
 		string df = datafileName(datName);
-		freopen(df.c_str(), "w", stdout);
-		cout<<value<<endl;
-		fclose(stdin);
+		ofstream file;
+		file.open(df.c_str());
+		file<<value<<endl;
+		file.close();
 
 		datFiles++;	//above file added
 
@@ -221,9 +229,10 @@ BPTree::insert(float key, const string& value)
 BPTreeNode
 BPTree::search(float key)
 {
-	freopen("meta", "r", stdin);
-	cin>>intNodes>>leafNodes>>root>>datFiles;
-	fclose(stdin);
+	ifstream file;
+	file.open("meta");
+	file>>intNodes>>leafNodes>>root>>datFiles;
+	file.close();
 	BPTreeNode t = searchT(key, root);
 	return t;
 }

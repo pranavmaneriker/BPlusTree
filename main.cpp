@@ -15,7 +15,7 @@ int main(int argc, char ** argv)
 		cerr<<"Incorrect usage. Refer README for correct use."<<endl;
 		return 1;
 	}
-	else if(strcmp(argv[1], "-c")) //only inserts to create the tree
+	else if(strcmp(argv[1], "-c") == 0) //only inserts to create the tree
 	{
 		float key;
 		string value;
