@@ -1,42 +1,42 @@
 Time Ins
-Min: 0
-Max: 8910
-Avg: 5.83805
-Std dev:37.2294
+Min: 1
+Max: 52
+Avg: 2.649
+Std dev:2.13115
 
 
 Time Point Q
-Min: 1e+19
-Max: 0
-Avg: -nan
-Std dev:-nan
+Min: 0
+Max: 2
+Avg: 0.441
+Std dev:0.502513
 
 
 Time Range Q
-Min: 1e+19
-Max: 0
-Avg: -nan
-Std dev:-nan
+Min: 0
+Max: 3
+Avg: 0.905
+Std dev:0.485773
 
 
 Disk Access Ins
-Min: 2
-Max: 12
-Avg: 6.01004
-Std dev:0.309191
+Min: 6
+Max: 6
+Avg: 6
+Std dev:0
 
 
 Disk Access PQ
-Min: 1e+19
-Max: 0
-Avg: -nan
-Std dev:-nan
+Min: 3
+Max: 3
+Avg: 3
+Std dev:0
 
 
 Disk Access Range Q
-Min: 1e+19
-Max: 0
-Avg: -nan
-Std dev:-nan
+Min: 6
+Max: 7
+Avg: 6.266
+Std dev:0.441864
 
 
