@@ -8,29 +8,8 @@ Classes for the tree and nodes
 **/
 using namespace std;
 
-class Helpers{	//use static if time
-public:
-	string numToStr(int num)
-	{
-		stringstream ss;
-		ss << num;
-		return ss.str();	
-	}
-	string nodefileName(const string& dataFile)
-	{
-		string prefix = "nodes/";
-		return prefix + dataFile;
-	}
 
-	string datafileName(const string& dataFile)
-	{
-		string prefix = "data/";
-		return prefix + dataFile;
-	}
-
-};
-
-class BPTreeNode : Helpers{
+class BPTreeNode {
 	public:
 	bool leaf;
 	string parent;
@@ -59,7 +38,7 @@ class BPTreeNode : Helpers{
 	
 };
 
-class BPTree : Helpers{
+class BPTree {
 	string root;
 	int degree;
 	int intNodes, leafNodes, datFiles;

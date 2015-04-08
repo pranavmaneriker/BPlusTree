@@ -79,4 +79,24 @@ static void updDA()
 }
 
 
+static string numToStr(int num)
+{
+	stringstream ss;
+	ss << num;
+	return ss.str();	
+}
+
+static string nodefileName(const string& dataFile)
+{
+	string prefix = "nodes/";
+	return prefix + dataFile;
+}
+
+static string datafileName(const string& dataFile)
+{
+	string prefix = "data/";
+	return prefix + dataFile;
+}
+
+
 #endif

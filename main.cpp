@@ -4,11 +4,14 @@
 #include<cstring>
 #include<cstdio>
 #include<ctime>
+#include<cmath>
 #include<sys/time.h>
 #include<fstream>
 
 #include "btree.hpp"
 #include "global.h"
+
+#define EPSILON 2e-10 
 
 using namespace std;
 
@@ -32,6 +35,11 @@ long getTimeMs()
  return ret;
 }
 
+bool AreSame(double a, double b)
+{
+    return fabs(a - b) < EPSILON;
+}
+
 int main(int argc, char ** argv)
 {
 	long start;
@@ -39,7 +47,7 @@ int main(int argc, char ** argv)
 	int degree;
 	cin>>degree;
 	fclose(stdin);
-	int count = 0;
+	int count = 1;
 	bool didSomething = false;
 	if(argc != 3)
 	{
@@ -69,7 +77,7 @@ int main(int argc, char ** argv)
 				TimeIns.upd(getTimeMs()-start);
 				updDAEnd();
 			}
-			fclose(stdin);
+			file.close();
 			cout<<"Tree created successfully"<<endl;
 		}
 		else
@@ -89,6 +97,8 @@ int main(int argc, char ** argv)
 			int type;
 			double l,diff;
 			string s;
+			string fName;
+			string filetext;
 			while(cin>>type>>l)
 			{
 				if(type == 0){
@@ -110,13 +120,20 @@ int main(int argc, char ** argv)
 					TimePQ.upd(getTimeMs() - start);
 					updDAEnd();
 					//search in tnode
+					ifstream file;
 					for(int i=0;i<tnode.cCount;++i)
 					{
-						if (tnode.keys[i] == l)
+						if (AreSame(tnode.keys[i], l))
 						{
-							cout<<tnode.lChild[i]<<endl;
+							fName = datafileName(tnode.lChild[i]);
+							file.open(fName.c_str());
+							file>>filetext;
+							cout<<filetext;
+							file.close();
+							break;
 						}
 					}
+					cout<<endl;
 				}
 				else if(type == 2)
 				{
@@ -129,38 +146,67 @@ int main(int argc, char ** argv)
 					updDASt();
 					BPTreeNode lnode = b->search(lval);
 					BPTreeNode rnode = b->search(rval);
-					BPTreeNode *temp = new BPTreeNode(lnode.nextLeaf, degree);
+					BPTreeNode temp = lnode;
 					//extra iteration for stats
-					while(temp->fName!=rnode.fName)
+					while(temp.fName!=rnode.fName)
 					{
-						temp = new BPTreeNode(temp->nextLeaf, degree);
-						for(int i=0;i<temp->cCount;++i)
-						{
-							cout<<temp->lChild[i]<<" ";
-						}
+						temp = BPTreeNode(temp.nextLeaf, degree);
 					}
 					TimeRQ.upd(getTimeMs()-start);
 					updDAEnd();
-					BPTreeNode *n = new BPTreeNode(lnode.nextLeaf, degree);
 					//print from lval to rval only
 					int i;
-					for(i=0;i<lnode.cCount && lval >=lnode.keys[i]; ++i);
-					for(;i<lnode.cCount;++i)
-					{cout<<lnode.lChild[i]<<" ";}
-					while(n->fName!=rnode.fName)
+					ifstream file;
+					if(lnode.fName == rnode.fName)
 					{
-						n = new BPTreeNode(n->nextLeaf, degree);
-						for(int i=0;i<n->cCount;++i)
+						for(i=0;i<lnode.cCount;++i)
 						{
-							cout<<n->lChild[i]<<" ";
+							if(lnode.keys[i]<= rval && lnode.keys[i]>=lval )
+							{
+								fName = datafileName(lnode.lChild[i]);
+								file.open(fName.c_str());
+								file>>filetext;
+								file.close();
+								cout<<filetext<<" ";
+							}
 						}
 					}
-					for(int i=0;i<rnode.cCount && rnode.keys[i]<=rval;++i)
+					else
 					{
-						cout<<rnode.lChild[i]<<" ";
+						BPTreeNode n = BPTreeNode(lnode.nextLeaf, degree);
+						for(i=0;i<lnode.cCount && lval >=lnode.keys[i]; ++i);
+						for(;i<lnode.cCount;++i)
+						{
+							fName = datafileName(lnode.lChild[i]);
+							file.open(fName.c_str());
+							file>>filetext;
+							file.close();
+							cout<<filetext<<" ";
+						}
+						while(n.fName!=rnode.fName)
+						{
+							n = BPTreeNode(n.nextLeaf, degree);
+							for(int i=0;i<n.cCount;++i)
+							{
+								fName = datafileName(n.lChild[i]);
+								file.open(fName.c_str());
+								file>>filetext;
+								file.close();
+								cout<<filetext<<" ";
+							}
+						}
+						for(int i=0;i<rnode.cCount && rnode.keys[i]<=rval;++i)
+						{
+							fName = datafileName(rnode.lChild[i]);
+							file.open(fName.c_str());
+							file>>filetext;
+							file.close();
+							cout<<filetext<<" ";
+						}
 					}
 				}
 				count++;
+				cout<<endl;	
 			}
 
 
