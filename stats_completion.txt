@@ -1,8 +1,8 @@
 Time Ins
 Min: 0
-Max: 1097
-Avg: 6.14418
-Std dev:21.7594
+Max: 6257
+Avg: 5.95091
+Std dev:33.0993
 
 
 Time Point Q
